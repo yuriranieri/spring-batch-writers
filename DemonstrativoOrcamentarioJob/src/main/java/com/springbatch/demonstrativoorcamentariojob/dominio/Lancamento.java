@@ -1,42 +1,26 @@
 package com.springbatch.demonstrativoorcamentariojob.dominio;
 
+import java.util.Date;
+
 public class Lancamento {
 
-    private int codigoNaturezaDespesa;
-    private String descricaoNaturezaDespesa;
-    private String descricaoLancamento;
-    private String data;
+    private String descricao;
+    private Date data;
     private Double valor;
 
-    public int getCodigoNaturezaDespesa() {
-        return codigoNaturezaDespesa;
+    public String getDescricao() {
+        return descricao;
     }
 
-    public void setCodigoNaturezaDespesa(int codigoNaturezaDespesa) {
-        this.codigoNaturezaDespesa = codigoNaturezaDespesa;
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
-    public String getDescricaoNaturezaDespesa() {
-        return descricaoNaturezaDespesa;
-    }
-
-    public void setDescricaoNaturezaDespesa(String descricaoNaturezaDespesa) {
-        this.descricaoNaturezaDespesa = descricaoNaturezaDespesa;
-    }
-
-    public String getDescricaoLancamento() {
-        return descricaoLancamento;
-    }
-
-    public void setDescricaoLancamento(String descricaoLancamento) {
-        this.descricaoLancamento = descricaoLancamento;
-    }
-
-    public String getData() {
+    public Date getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(Date data) {
         this.data = data;
     }
 
@@ -48,14 +32,4 @@ public class Lancamento {
         this.valor = valor;
     }
 
-    @Override
-    public String toString() {
-        return "Lancamento{" +
-                "codigoNaturezaDespesa=" + codigoNaturezaDespesa +
-                ", descricaoNaturezaDespesa='" + descricaoNaturezaDespesa + '\'' +
-                ", descricaoLancamento='" + descricaoLancamento + '\'' +
-                ", data=" + data +
-                ", valor=" + valor +
-                '}';
-    }
 }

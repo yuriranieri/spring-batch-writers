@@ -1,10 +1,10 @@
 package com.springbatch.demonstrativoorcamentariojob.step;
 
-import com.springbatch.demonstrativoorcamentariojob.dominio.Lancamento;
+import com.springbatch.demonstrativoorcamentariojob.dominio.GrupoLancamento;
+import com.springbatch.demonstrativoorcamentariojob.reader.GrupoLancamentoReader;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
@@ -16,10 +16,10 @@ public class LancamentoDespesasStep {
     private StepBuilderFactory stepBuilderFactory;
 
     @Bean
-    public Step escritaLancamentoDespesasStep(JdbcCursorItemReader<Lancamento> reader,
-                                                 ItemWriter<Lancamento> writer) {
+    public Step escritaLancamentoDespesasStep(GrupoLancamentoReader reader,
+                                              ItemWriter<GrupoLancamento> writer) {
         return stepBuilderFactory.get("escritaLancamentoDespesasJobStep")
-                .<Lancamento, Lancamento>chunk(1)
+                .<GrupoLancamento, GrupoLancamento>chunk(1)
                 .reader(reader)
                 .writer(writer)
                 .build();
