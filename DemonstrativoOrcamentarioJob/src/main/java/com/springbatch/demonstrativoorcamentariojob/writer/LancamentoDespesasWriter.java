@@ -2,10 +2,12 @@ package com.springbatch.demonstrativoorcamentariojob.writer;
 
 import com.springbatch.demonstrativoorcamentariojob.dominio.GrupoLancamento;
 import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
+import org.springframework.batch.item.file.MultiResourceItemWriter;
+import org.springframework.batch.item.file.ResourceSuffixCreator;
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
+import org.springframework.batch.item.file.builder.MultiResourceItemWriterBuilder;
 import org.springframework.batch.item.file.transform.LineAggregator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +22,25 @@ import static java.lang.String.format;
 
 @Component
 public class LancamentoDespesasWriter {
+
+    @Bean
+    @StepScope
+    public MultiResourceItemWriter<GrupoLancamento> multiDemonstrativoOrcamentarioWriter(
+            @Value("#{jobParameters['arquivosSaidas']}") Resource resource,
+            FlatFileItemWriter<GrupoLancamento> demonstrativoOrcamentarioWriter) {
+        return new MultiResourceItemWriterBuilder<GrupoLancamento>()
+                .name("multiDemonstrativoOrcamentarioWriter")
+                .resource(resource)
+                .delegate(demonstrativoOrcamentarioWriter)
+                .resourceSuffixCreator(suffixCreator()) // cria sufixos
+                .itemCountLimitPerResource(1)
+                // para cada grupo lancamento criar um item, só é checado dps que le td o chunk
+                .build();
+    }
+
+    private ResourceSuffixCreator suffixCreator() {
+        return index -> index + ".txt";
+    }
 
     @Bean
     @StepScope

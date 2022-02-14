@@ -1,7 +1,9 @@
 package com.springbatch.demonstrativoorcamentariojob.writer;
 
 import com.springbatch.demonstrativoorcamentariojob.dominio.GrupoLancamento;
+import org.springframework.batch.core.annotation.BeforeChunk;
 import org.springframework.batch.core.annotation.BeforeWrite;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +29,11 @@ public class LancamentoDespesasFooter implements FlatFileFooterCallback {
     @BeforeWrite
     public void beforeWrite(List<GrupoLancamento> grupos) {
         grupos.forEach(grupo -> total += grupo.getTotal());
+    }
+
+    @BeforeChunk
+    public void afterChunk(ChunkContext context) {
+        total = 0.0;
     }
 
 }
