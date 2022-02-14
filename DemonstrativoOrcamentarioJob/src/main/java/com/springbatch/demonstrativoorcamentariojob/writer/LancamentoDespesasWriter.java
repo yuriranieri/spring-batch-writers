@@ -2,6 +2,8 @@ package com.springbatch.demonstrativoorcamentariojob.writer;
 
 import com.springbatch.demonstrativoorcamentariojob.dominio.GrupoLancamento;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.item.file.FlatFileFooterCallback;
+import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
 import org.springframework.batch.item.file.transform.LineAggregator;
@@ -12,6 +14,9 @@ import org.springframework.stereotype.Component;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import static java.lang.String.format;
 
 @Component
 public class LancamentoDespesasWriter {
@@ -19,29 +24,49 @@ public class LancamentoDespesasWriter {
     @Bean
     @StepScope
     public FlatFileItemWriter<GrupoLancamento> demonstrativoOrcamentarioWriter(
-            @Value("#{jobParameters['arquivoSaida']}") Resource resource) {
+            @Value("#{jobParameters['arquivoSaida']}") Resource resource,
+            LancamentoDespesasFooter footerCallback) {
         return new FlatFileItemWriterBuilder<GrupoLancamento>()
                 .name("demonstrativoOrcamentarioWriter")
                 .resource(resource)
                 .lineAggregator(lineAggregator())
                 // informa o formato, que fica customizado, lineAggregator define a logica de agregacao da linha
+                .headerCallback(headerCallback()) // criar o header(cabecalho)
+                .footerCallback(footerCallback) // cria o footer(rodape)
                 .build();
     }
 
     private LineAggregator<GrupoLancamento> lineAggregator() {
         return grupoLancamento -> {
-            var formatGrupo = String.format("[%d] %s - %s%n", grupoLancamento.getCodigoNaturezaDespesa(),
+            var formatGrupo = format("[%d] %s - %s%n", grupoLancamento.getCodigoNaturezaDespesa(),
                     grupoLancamento.getDescricaoNaturezaDespesa(),
                     NumberFormat.getCurrencyInstance().format(grupoLancamento.getTotal()));
 
             var stringBuilder = new StringBuilder();
             grupoLancamento.getLancamentos().forEach(lancamento -> stringBuilder.append(
-                    String.format("\t [%s] %s - %s%n",
+                    format("\t [%s] %s - %s%n",
                             new SimpleDateFormat("dd/MM/yyyy").format(lancamento.getData()),
                             lancamento.getDescricao(),
                             NumberFormat.getCurrencyInstance().format(lancamento.getValor()))));
             var formatLancamento = stringBuilder.toString();
             return formatGrupo + formatLancamento;
+        };
+    }
+
+    private FlatFileHeaderCallback headerCallback() {
+        return writer -> {
+            writer.append(format("SISTEMA INTEGRADO: XPTO \t\t\t\t DATA: %s%n",
+                    new SimpleDateFormat("dd//MM/yyyy").format(new Date())));
+            writer.append(format("MÓDULO: ORÇAMENTO \t\t\t\t\t\t HORA: %s",
+                    new SimpleDateFormat("HH:mm").format(new Date())));
+            writer.append(format("MÓDULO: ORÇAMENTO \t\t\t\t\t HORA: %s",
+                    new SimpleDateFormat("HH:mm").format(new Date())));
+            writer.append("\t\t\tDEMONSTRATIVO ORCAMENTARIO\n");
+            writer.append("----------------------------------------------------------------------------\n");
+            writer.append("CODIGO NOME VALOR\n");
+            writer.append("\t Data Descricao Valor\n");
+            writer.append("----------------------------------------------------------------------------\n");
+
         };
     }
 
